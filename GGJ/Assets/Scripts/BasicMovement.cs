@@ -3,43 +3,28 @@ using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class BasicMovement : MonoBehaviour
+public class BubbleMovementController : MonoBehaviour
 {
+    // TODO:禁用上下左右方向键
     private static readonly int Horizontal = Animator.StringToHash("Horizontal");
     
     public event Action OnBubblePopped;                  // 泡泡破裂事件
     
     #region Variable Declarations
     
-    [Header("基本移动设置")]
-    [SerializeField] private float moveForce = 5f;              // 移动力
-    [SerializeField] private float maxSpeed = 2f;               // 最大速度
-    [SerializeField] private float dragFactor = 0.5f;           // 空气阻力系数
-    [SerializeField] private float buoyancyForce = 9.81f;       // 浮力大小
-    [SerializeField] private float minMovementSpeed = 0.2f;     // 最小保持速度
-    [SerializeField] private float dragThreshold = 0.3f;        // 开始应用阻力的速度阈值
-    
-    [Header("随机浮动设置")]
-    [SerializeField] private float randomForceInterval = 0.5f;  // 随机力施加间隔
-    [SerializeField] private float randomForceStrength = 0.1f;  // 随机力强度
-    [SerializeField] private float maxRandomOffset = 0.2f;      // 最大随机偏移距离
-    private Vector2 _floatingCenter;                            // 浮动中心点
-    private float _randomForceTimer;                            // 随机力计时器
-    private float _centerUpdateTimer;                           // 中心点更新计时器
-    private const float CenterUpdateInterval = 5f;              // 中心点更新间隔
+    [Header("泡泡配置")]
+    [SerializeField] private BubbleConfig bubbleConfig;
+    [SerializeField] private int currentLevel = 3;  // 默认为3级
+    private BubbleLevelConfig _currentConfig;
     
     [Header("干燥表面设置")]
     [SerializeField] private float dryValue;                    // 当前干燥值
     [SerializeField] private float maxDryValue = 5f;            // 最大干燥值
     [SerializeField] private float dryRecoveryTime = 3f;        // 干燥值恢复所需时间
-    [SerializeField] private float minBounceForce = 3f;         // 最小反弹力
-    [SerializeField] private float maxBounceForce = 8f;         // 最大反弹力
-    [SerializeField] private float bounceVelocityMultiplier = 0.8f;  // 速度对反弹力的影响系数
     private float _dryRecoveryTimer;                      // 干燥值恢复计时器
     private bool _canBounce = true;                       // 是否可以反弹
     
     [Header("湿润表面设置")]
-    [SerializeField] private float wetSurfaceMoveSpeed = 1f;  // 在湿润表面上的移动速度
     [SerializeField] private float coyoteTime = 0.2f;         // 缓冲时间
     [SerializeField] private float doubleTapInterval = 0.25f; // 双击时间间隔
     private bool _isAttached;                                 // 是否吸附在表面上
@@ -51,6 +36,12 @@ public class BasicMovement : MonoBehaviour
     [Header("音效设置")]
     [SerializeField] private float minPitchVariation = 0.9f;    // 最小音调变化
     [SerializeField] private float maxPitchVariation = 1.1f;    // 最大音调变化
+    
+    // 随机浮动相关
+    private Vector2 _floatingCenter;                            // 浮动中心点
+    private float _randomForceTimer;                            // 随机力计时器
+    private float _centerUpdateTimer;                           // 中心点更新计时器
+    private const float CenterUpdateInterval = 5f;              // 中心点更新间隔
     
     // 组件引用
     private Animator _animator;
@@ -68,6 +59,9 @@ public class BasicMovement : MonoBehaviour
         _animator = GetComponent<Animator>();
         _colliderCheck = GetComponent<ColliderCheck>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        // 加载当前级别的配置
+        LoadLevelConfig();
     }
 
     private void Update()
@@ -125,6 +119,23 @@ public class BasicMovement : MonoBehaviour
     
     #endregion
     
+    #region Bubble Config
+    
+    public void SetBubbleLevel(int level)
+    {
+        currentLevel = Mathf.Clamp(level, 1, 5);
+        LoadLevelConfig();
+        UpdateVisuals();
+    }
+    
+    private void LoadLevelConfig()
+    {
+        _currentConfig = bubbleConfig.GetLevelConfig(currentLevel);
+        _rb.gravityScale = _currentConfig.gravityScale;
+    }
+    
+    #endregion
+    
     #region Movement System
     
     /// <summary>
@@ -161,27 +172,32 @@ public class BasicMovement : MonoBehaviour
         if (inputDirection.magnitude > 0.1f)
         {
             Vector2 currentVelocity = _rb.velocity;
-            float currentSpeed = currentVelocity.magnitude;
             
-            if (currentSpeed < maxSpeed)
-            {
-                _rb.AddForce(inputDirection * moveForce);
-            }
+            // 分别检查水平和垂直方向的速度限制
+            bool canMoveHorizontal = Mathf.Abs(currentVelocity.x) < _currentConfig.maxHorizontalSpeed;
+            bool canMoveVertical = vertical > 0 
+                ? currentVelocity.y < _currentConfig.maxUpwardSpeed 
+                : currentVelocity.y > -_currentConfig.maxDownwardSpeed;
+            
+            // 根据方向应用力
+            Vector2 force = Vector2.zero;
+            if (canMoveHorizontal) force.x = inputDirection.x;
+            if (canMoveVertical) force.y = inputDirection.y;
+            
+            _rb.AddForce(force * _currentConfig.moveForce);
         }
+        
+        // 限制速度
+        Vector2 velocity = _rb.velocity;
+        velocity.x = Mathf.Clamp(velocity.x, -_currentConfig.maxHorizontalSpeed, _currentConfig.maxHorizontalSpeed);
+        velocity.y = Mathf.Clamp(velocity.y, -_currentConfig.maxDownwardSpeed, _currentConfig.maxUpwardSpeed);
+        _rb.velocity = velocity;
         
         // 应用阻力
         ApplyDrag();
         
         // 应用随机浮动力
         ApplyRandomForce();
-        
-        // 限制速度
-        Vector2 velocity = _rb.velocity;
-        if (velocity.magnitude > maxSpeed)
-        {
-            velocity = velocity.normalized * maxSpeed;
-            _rb.velocity = velocity;
-        }
         
         // 更新朝向
         UpdateFacingDirection(horizontal);
@@ -195,12 +211,12 @@ public class BasicMovement : MonoBehaviour
         Vector2 velocity = _rb.velocity;
         
         // 只在没有对应方向的输入时应用阻力
-        if (velocity.magnitude > dragThreshold)
+        if (velocity.magnitude > _currentConfig.dragThreshold)
         {
-            Vector2 dragForce = -velocity.normalized * dragFactor;
+            Vector2 dragForce = -velocity.normalized * _currentConfig.dragFactor;
             
             // 如果速度接近最小速度，减小阻力
-            if (velocity.magnitude < minMovementSpeed * 1.5f)
+            if (velocity.magnitude < _currentConfig.minMovementSpeed * 1.5f)
             {
                 dragForce *= 0.5f;
             }
@@ -241,7 +257,7 @@ public class BasicMovement : MonoBehaviour
         _randomForceTimer += Time.deltaTime;
         
         // 定期应用随机力
-        if (_randomForceTimer >= randomForceInterval)
+        if (_randomForceTimer >= _currentConfig.randomForceInterval)
         {
             _randomForceTimer = 0f;
             
@@ -250,13 +266,13 @@ public class BasicMovement : MonoBehaviour
             
             // 生成随机方向的力
             Vector2 randomDirection = Random.insideUnitCircle.normalized;
-            Vector2 finalForce = randomDirection * randomForceStrength;
+            Vector2 finalForce = randomDirection * _currentConfig.randomForceStrength;
             
             // 如果偏离中心点太远，添加一个返回力
-            if (offset.magnitude > maxRandomOffset)
+            if (offset.magnitude > _currentConfig.maxRandomOffset)
             {
                 Vector2 returnDirection = (_floatingCenter - (Vector2)transform.position).normalized;
-                finalForce += returnDirection * randomForceStrength;
+                finalForce += returnDirection * _currentConfig.randomForceStrength;
             }
             
             _rb.AddForce(finalForce, ForceMode2D.Impulse);
@@ -271,15 +287,12 @@ public class BasicMovement : MonoBehaviour
         if (!_isAttached)
         {
             // 应用浮力
-            _rb.AddForce(Vector2.up * 9.81f);
+            _rb.AddForce(Vector2.up * _currentConfig.buoyancyForce);
             
             // 限制速度
             Vector2 velocity = _rb.velocity;
-            if (velocity.magnitude > maxSpeed)
-            {
-                velocity = velocity.normalized * maxSpeed;
-                _rb.velocity = velocity;
-            }
+            velocity.y = Mathf.Clamp(velocity.y, -_currentConfig.maxDownwardSpeed, _currentConfig.maxUpwardSpeed);
+            _rb.velocity = velocity;
         }
     }
     
@@ -320,21 +333,38 @@ public class BasicMovement : MonoBehaviour
         {
             // 获取碰撞点信息
             ContactPoint2D contact = collision.GetContact(0);
+            Vector2 normal = contact.normal;
             
-        
             // 使用碰撞的相对速度
             float impactVelocity = collision.relativeVelocity.magnitude;
             
+            // 判断主要的碰撞方向
+            bool isHorizontalCollision = Mathf.Abs(normal.x) > Mathf.Abs(normal.y);
+            // 根据碰撞方向选择参考速度
+            float maxReferenceSpeed = isHorizontalCollision 
+                ? _currentConfig.maxHorizontalSpeed
+                : (normal.y > 0 ? _currentConfig.maxDownwardSpeed : _currentConfig.maxUpwardSpeed);
+            
             // 基于相对速度计算反弹力度，并限制在最大最小值之间
-            float velocityFactor = Mathf.Clamp01(impactVelocity / maxSpeed); // 将速度标准化到0-1范围
-            float bounceMagnitude = Mathf.Lerp(minBounceForce, maxBounceForce, velocityFactor);
+            float velocityFactor = Mathf.Clamp01(impactVelocity / maxReferenceSpeed); // 将速度标准化到0-1范围
+            float bounceMagnitude = Mathf.Lerp(_currentConfig.minBounceForce, _currentConfig.maxBounceForce, velocityFactor);
         
             // 应用速度影响系数
-            bounceMagnitude *= bounceVelocityMultiplier;
+            bounceMagnitude *= _currentConfig.bounceVelocityMultiplier;
             
-            // 清除原有的垂直速度
+            // 根据碰撞面方向清除相应的速度分量
             Vector2 currentVelocity = _rb.velocity;
-            _rb.velocity = new Vector2(currentVelocity.x, 0f);
+            if (isHorizontalCollision)
+            {
+                // 碰到垂直面，清除水平速度
+                currentVelocity.x = 0f;
+            }
+            else
+            {
+                // 碰到水平面，清除垂直速度
+                currentVelocity.y = 0f;
+            }
+            _rb.velocity = currentVelocity;
             
             // 应用反弹力
             _rb.AddForce(contact.normal * bounceMagnitude, ForceMode2D.Impulse);
@@ -457,7 +487,7 @@ public class BasicMovement : MonoBehaviour
         float moveInput = Vector2.Dot(inputDirection, moveDirection);
         
         // 应用移动
-        _rb.velocity = moveDirection * (moveInput * wetSurfaceMoveSpeed);
+        _rb.velocity = moveDirection * (moveInput * _currentConfig.wetSurfaceMoveSpeed);
         
         // 检查是否需要脱离表面
         CheckDetachment(inputDirection);
@@ -532,6 +562,12 @@ public class BasicMovement : MonoBehaviour
     #endregion
     
     #region Visual and Audio
+    
+    private void UpdateVisuals()
+    {
+        // TODO: 根据当前级别更新Sprite和动画
+        _animator.SetInteger("BubbleLevel", currentLevel);
+    }
     
     /// <summary>
     /// 更新动画状态
