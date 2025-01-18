@@ -5,7 +5,6 @@ using Random = UnityEngine.Random;
 
 public class BubbleMovementController : MonoBehaviour
 {
-    // TODO:禁用上下左右方向键
     private static readonly int Horizontal = Animator.StringToHash("Horizontal");
     
     public event Action OnBubblePopped;                  // 泡泡破裂事件
@@ -40,9 +39,8 @@ public class BubbleMovementController : MonoBehaviour
     private const float CenterUpdateInterval = 5f;              // 中心点更新间隔
     
     // 组件引用
-    private Rigidbody2D _rb;
     private Animator _animator;
-    private CircleCollider2D _circleCollider;    // 添加碰撞体引用
+    private Rigidbody2D _rb;
     private ColliderCheck _colliderCheck;
     private SpriteRenderer _spriteRenderer;
 
@@ -54,7 +52,6 @@ public class BubbleMovementController : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
-        _circleCollider = GetComponent<CircleCollider2D>();
         _colliderCheck = GetComponent<ColliderCheck>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         
@@ -99,7 +96,7 @@ public class BubbleMovementController : MonoBehaviour
         switch (surface.Type)
         {
             case SurfaceType.Dry:
-                HandleDrySurfaceCollision();
+                HandleDrySurfaceCollision(collision);
                 break;
             case SurfaceType.Wet:
                 // 只有在未吸附状态下才处理新的湿润表面
@@ -130,12 +127,6 @@ public class BubbleMovementController : MonoBehaviour
     {
         _currentConfig = bubbleConfig.GetLevelConfig(currentLevel);
         _rb.gravityScale = _currentConfig.gravityScale;
-        
-        // 应用物理材质
-        if (_circleCollider != null && _currentConfig.physicsMaterial != null)
-        {
-            _circleCollider.sharedMaterial = _currentConfig.physicsMaterial;
-        }
     }
     
     #endregion
@@ -319,7 +310,7 @@ public class BubbleMovementController : MonoBehaviour
     /// <summary>
     /// 处理与干燥表面的碰撞
     /// </summary>
-    private void HandleDrySurfaceCollision()
+    private void HandleDrySurfaceCollision(Collision2D collision)
     {
         // 增加干燥值
         dryValue = Mathf.Min(dryValue + 1f, maxDryValue);
@@ -335,7 +326,45 @@ public class BubbleMovementController : MonoBehaviour
         // 处理反弹效果
         if (_canBounce)
         {
-            // 播放声音效果
+            // 获取碰撞点信息
+            ContactPoint2D contact = collision.GetContact(0);
+            Vector2 normal = contact.normal;
+            
+            // 使用碰撞的相对速度
+            float impactVelocity = collision.relativeVelocity.magnitude;
+            
+            // 判断主要的碰撞方向
+            bool isHorizontalCollision = Mathf.Abs(normal.x) > Mathf.Abs(normal.y);
+            // 根据碰撞方向选择参考速度
+            float maxReferenceSpeed = isHorizontalCollision 
+                ? _currentConfig.maxHorizontalSpeed
+                : (normal.y > 0 ? _currentConfig.maxDownwardSpeed : _currentConfig.maxUpwardSpeed);
+            
+            // 基于相对速度计算反弹力度，并限制在最大最小值之间
+            float velocityFactor = Mathf.Clamp01(impactVelocity / maxReferenceSpeed); // 将速度标准化到0-1范围
+            float bounceMagnitude = Mathf.Lerp(_currentConfig.minBounceForce, _currentConfig.maxBounceForce, velocityFactor);
+        
+            // 应用速度影响系数
+            bounceMagnitude *= _currentConfig.bounceVelocityMultiplier;
+            
+            // 根据碰撞面方向清除相应的速度分量
+            Vector2 currentVelocity = _rb.velocity;
+            if (isHorizontalCollision)
+            {
+                // 碰到垂直面，清除水平速度
+                currentVelocity.x = 0f;
+            }
+            else
+            {
+                // 碰到水平面，清除垂直速度
+                currentVelocity.y = 0f;
+            }
+            _rb.velocity = currentVelocity;
+            
+            // 应用反弹力
+            _rb.AddForce(contact.normal * bounceMagnitude, ForceMode2D.Impulse);
+            
+            // 播放声音效果（音量基于反弹力度）
             PlayBounceSound();
             
             // 开始反弹冷却

@@ -26,9 +26,6 @@ public class BubbleLevelConfig
 
     [Header("湿润表面设置")]
     public float wetSurfaceMoveSpeed = 1f;    // 在湿润表面上的移动速度
-    
-    [Header("物理材质设置")]
-    public PhysicsMaterial2D physicsMaterial;
 }
 
 [CreateAssetMenu(fileName = "BubbleConfig", menuName = "Game/BubbleConfig")]
@@ -87,6 +84,9 @@ public class BubbleConfig : ScriptableObject
         config.randomForceInterval = 0.2f;
         config.randomForceStrength = 0.3f;
         config.maxRandomOffset = 0.5f;
+        config.minBounceForce = 8f;
+        config.maxBounceForce = 15f;
+        config.bounceVelocityMultiplier = 1.2f;
         config.wetSurfaceMoveSpeed = 3f;
     }
 
@@ -104,6 +104,9 @@ public class BubbleConfig : ScriptableObject
         config.randomForceInterval = 0.4f;
         config.randomForceStrength = 0.15f;
         config.maxRandomOffset = 0.3f;
+        config.minBounceForce = 5f;
+        config.maxBounceForce = 10f;
+        config.bounceVelocityMultiplier = 1f;
         config.wetSurfaceMoveSpeed = 2f;
     }
 
@@ -122,6 +125,9 @@ public class BubbleConfig : ScriptableObject
         config.randomForceInterval = 0.5f;
         config.randomForceStrength = 0.1f;
         config.maxRandomOffset = 0.2f;
+        config.minBounceForce = 3f;
+        config.maxBounceForce = 8f;
+        config.bounceVelocityMultiplier = 0.8f;
         config.wetSurfaceMoveSpeed = 1f;
     }
 
@@ -139,6 +145,9 @@ public class BubbleConfig : ScriptableObject
         config.randomForceInterval = 0.6f;
         config.randomForceStrength = 0.08f;
         config.maxRandomOffset = 0.15f;
+        config.minBounceForce = 2f;
+        config.maxBounceForce = 6f;
+        config.bounceVelocityMultiplier = 0.6f;
         config.wetSurfaceMoveSpeed = 0.8f;
     }
 
@@ -156,6 +165,9 @@ public class BubbleConfig : ScriptableObject
         config.randomForceInterval = 0.8f;
         config.randomForceStrength = 0.05f;
         config.maxRandomOffset = 0.1f;
+        config.minBounceForce = 1f;
+        config.maxBounceForce = 4f;
+        config.bounceVelocityMultiplier = 0.4f;
         config.wetSurfaceMoveSpeed = 0.5f;
     }
 
