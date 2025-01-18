@@ -33,10 +33,6 @@ public class BubbleMovementController : MonoBehaviour
     private float _lastTapTime;                               // 上次按键时间
     private bool _isFirstTap;                                 // 是否是第一次按键
     
-    [Header("音效设置")]
-    [SerializeField] private float minPitchVariation = 0.9f;    // 最小音调变化
-    [SerializeField] private float maxPitchVariation = 1.1f;    // 最大音调变化
-    
     // 随机浮动相关
     private Vector2 _floatingCenter;                            // 浮动中心点
     private float _randomForceTimer;                            // 随机力计时器
@@ -44,8 +40,9 @@ public class BubbleMovementController : MonoBehaviour
     private const float CenterUpdateInterval = 5f;              // 中心点更新间隔
     
     // 组件引用
-    private Animator _animator;
     private Rigidbody2D _rb;
+    private Animator _animator;
+    private CircleCollider2D _circleCollider;    // 添加碰撞体引用
     private ColliderCheck _colliderCheck;
     private SpriteRenderer _spriteRenderer;
 
@@ -57,6 +54,7 @@ public class BubbleMovementController : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
+        _circleCollider = GetComponent<CircleCollider2D>();
         _colliderCheck = GetComponent<ColliderCheck>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         
@@ -101,7 +99,7 @@ public class BubbleMovementController : MonoBehaviour
         switch (surface.Type)
         {
             case SurfaceType.Dry:
-                HandleDrySurfaceCollision(collision);
+                HandleDrySurfaceCollision();
                 break;
             case SurfaceType.Wet:
                 // 只有在未吸附状态下才处理新的湿润表面
@@ -132,6 +130,12 @@ public class BubbleMovementController : MonoBehaviour
     {
         _currentConfig = bubbleConfig.GetLevelConfig(currentLevel);
         _rb.gravityScale = _currentConfig.gravityScale;
+        
+        // 应用物理材质
+        if (_circleCollider != null && _currentConfig.physicsMaterial != null)
+        {
+            _circleCollider.sharedMaterial = _currentConfig.physicsMaterial;
+        }
     }
     
     #endregion
@@ -315,7 +319,7 @@ public class BubbleMovementController : MonoBehaviour
     /// <summary>
     /// 处理与干燥表面的碰撞
     /// </summary>
-    private void HandleDrySurfaceCollision(Collision2D collision)
+    private void HandleDrySurfaceCollision()
     {
         // 增加干燥值
         dryValue = Mathf.Min(dryValue + 1f, maxDryValue);
@@ -331,46 +335,8 @@ public class BubbleMovementController : MonoBehaviour
         // 处理反弹效果
         if (_canBounce)
         {
-            // 获取碰撞点信息
-            ContactPoint2D contact = collision.GetContact(0);
-            Vector2 normal = contact.normal;
-            
-            // 使用碰撞的相对速度
-            float impactVelocity = collision.relativeVelocity.magnitude;
-            
-            // 判断主要的碰撞方向
-            bool isHorizontalCollision = Mathf.Abs(normal.x) > Mathf.Abs(normal.y);
-            // 根据碰撞方向选择参考速度
-            float maxReferenceSpeed = isHorizontalCollision 
-                ? _currentConfig.maxHorizontalSpeed
-                : (normal.y > 0 ? _currentConfig.maxDownwardSpeed : _currentConfig.maxUpwardSpeed);
-            
-            // 基于相对速度计算反弹力度，并限制在最大最小值之间
-            float velocityFactor = Mathf.Clamp01(impactVelocity / maxReferenceSpeed); // 将速度标准化到0-1范围
-            float bounceMagnitude = Mathf.Lerp(_currentConfig.minBounceForce, _currentConfig.maxBounceForce, velocityFactor);
-        
-            // 应用速度影响系数
-            bounceMagnitude *= _currentConfig.bounceVelocityMultiplier;
-            
-            // 根据碰撞面方向清除相应的速度分量
-            Vector2 currentVelocity = _rb.velocity;
-            if (isHorizontalCollision)
-            {
-                // 碰到垂直面，清除水平速度
-                currentVelocity.x = 0f;
-            }
-            else
-            {
-                // 碰到水平面，清除垂直速度
-                currentVelocity.y = 0f;
-            }
-            _rb.velocity = currentVelocity;
-            
-            // 应用反弹力
-            _rb.AddForce(contact.normal * bounceMagnitude, ForceMode2D.Impulse);
-            
-            // 播放声音效果（音量基于反弹力度）
-            PlayBounceSound(velocityFactor);
+            // 播放声音效果
+            PlayBounceSound();
             
             // 开始反弹冷却
             StartCoroutine(BounceDelay());
@@ -598,16 +564,13 @@ public class BubbleMovementController : MonoBehaviour
         gameObject.SetActive(false);
     }
     
-    private void PlayBounceSound(float velocityFactor)
+    private void PlayBounceSound()
     {
-        // 根据撞击强度调整音调
-        float pitch = Mathf.Lerp(minPitchVariation, maxPitchVariation, velocityFactor);
         // AudioManager.Instance.PlaySound("BubbleBounce", pitch);
     }
 
     private void PlayJumpSound()
     {
-        float pitch = UnityEngine.Random.Range(minPitchVariation, maxPitchVariation);
         // AudioManager.Instance.PlaySound("BubbleJump", pitch);
     }
 
