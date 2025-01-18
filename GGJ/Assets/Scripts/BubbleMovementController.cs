@@ -507,38 +507,27 @@ public class BubbleMovementController : MonoBehaviour
             keyPressed = keyPressed || (inputDirection.y > 0 ? Input.GetKeyDown(KeyCode.W) : Input.GetKeyDown(KeyCode.S));
         }
         
-        if (dotProduct > 0.7f && keyPressed) // 允许一定的角度误差
+        if (dotProduct > 0.7f && keyPressed)
         {
             float currentTime = Time.time;
-            
+        
             if (!_isFirstTap)
             {
                 _isFirstTap = true;
                 _lastTapTime = currentTime;
             }
+            else if (currentTime - _lastTapTime <= doubleTapInterval)
+            {
+                DetachFromSurface();
+                _isFirstTap = false;
+            }
             else
             {
-                // 检查是否在时间间隔内进行了第二次按键
-                if (currentTime - _lastTapTime <= doubleTapInterval)
-                {
-                    DetachFromSurface();
-                    _isFirstTap = false;
-                }
-                else
-                {
-                    // 超出时间窗口，重置为第一次按键
-                    _lastTapTime = currentTime;
-                }
+                _lastTapTime = currentTime;
             }
         }
-        else if (!keyPressed)
+        else if (keyPressed)
         {
-            // 保持当前的双击状态
-            return;
-        }
-        else
-        {
-            // 输入方向改变，重置双击状态
             _isFirstTap = false;
         }
     }
