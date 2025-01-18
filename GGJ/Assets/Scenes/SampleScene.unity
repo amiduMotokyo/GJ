@@ -1632,19 +1632,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25738e56b7727d041af50283a74727e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
-  dashForce: 5
-  dashCooldown: 0.5
-  baseForce: 9.81
+  bubbleConfig: {fileID: 11400000, guid: 229587189a8adc54c99664e450188a60, type: 2}
+  currentLevel: 3
   dryValue: 0
   maxDryValue: 5
   dryRecoveryTime: 5
-  dryBounceForce: 5
-  bounceVelocityMultiplier: 0.5
-  wetSurfaceMoveSpeed: 1
   coyoteTime: 0.2
-  minPitchVariation: 0.9
-  maxPitchVariation: 1.1
+  doubleTapInterval: 0.25
 --- !u!95 &1773315814
 Animator:
   serializedVersion: 5
