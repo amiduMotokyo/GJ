@@ -15,13 +15,16 @@ public class SelectionPanel : BasePanel
             //处理点击“开始”选项
             SoundManager.Instance.PlaySound("点击");
             Debug.Log("点击了Start");
-
+            GameObject.Find("GameRoot").GetComponent<LevelManager>().nowLevel = 1;
+            PanelManager.Pop();
+            GameRoot.Instance.SceneSystem.SetScene(new Level_1());
         });
         UITool.GetOrAddComponentInChildren<Button>("Choose").onClick.AddListener(() =>
         {
             //处理点击“选关”选项
             SoundManager.Instance.PlaySound("点击");
             Debug.Log("点击了Choose");
+            PanelManager.Push(new SelevtLevelPanel());
         });
         UITool.GetOrAddComponentInChildren<Button>("Exit").onClick.AddListener(() =>
         {
