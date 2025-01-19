@@ -26,7 +26,7 @@ public class PanelManager
     /// UI的入栈操作，此操作会显示一个面板
     /// </summary>
     /// <param name="nextPanel">要显示的面板</param>
-    public void Push(BasePanel nextPanel)
+    public void Push(BasePanel nextPanel,bool isTransparent = false)
     {
         if (stackPanel.Count > 0) 
         {
@@ -35,19 +35,23 @@ public class PanelManager
         }
         stackPanel.Push(nextPanel);
         GameObject panelGameObject = uiManager.GetSingleUI(nextPanel.UIType);
-        ////把所有对象的初始透明度变成0
-        //if(panelGameObject.GetComponent<Image>())
-        //    panelGameObject.GetComponent<Image>().color = new Color(panelGameObject.GetComponent<Image>().color.r, panelGameObject.GetComponent<Image>().color.g, panelGameObject.GetComponent<Image>().color.b, 0);
-        //foreach(Transform child in panelGameObject.transform)
-        //{
-        //    if(child.GetComponent<Image>())
-        //        child.GetComponent<Image>().color = new Color(child.GetComponent<Image>().color.r, child.GetComponent<Image>().color.g, child.GetComponent<Image>().color.b, 0);
-        //}
+        //把所有对象的初始透明度变成0
+        if(isTransparent == true)
+        {
+            if (panelGameObject.GetComponent<Image>())
+                panelGameObject.GetComponent<Image>().color = new Color(panelGameObject.GetComponent<Image>().color.r, panelGameObject.GetComponent<Image>().color.g, panelGameObject.GetComponent<Image>().color.b, 0);
+            foreach (Transform child in panelGameObject.transform)
+            {
+                if (child.GetComponent<Image>())
+                    child.GetComponent<Image>().color = new Color(child.GetComponent<Image>().color.r, child.GetComponent<Image>().color.g, child.GetComponent<Image>().color.b, 0);
+            }
+        }
         nextPanel.Initialize(new UITool(panelGameObject));
         nextPanel.Initialize(this);
         nextPanel.Initialize(uiManager);
         nextPanel.OnEnter();
     }
+
     /// <summary>
     /// UI的出栈操作，此操作会执行面板的OnExit方法
     /// </summary>

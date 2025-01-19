@@ -12,31 +12,32 @@ public class SelectionPanel : BasePanel
     {
         UITool.GetOrAddComponentInChildren<Button>("Start").onClick.AddListener(() =>
         {
+            Animator _animator = UITool.GetGameObject().GetComponent<Animator>();
+
             //处理点击“开始”选项
             SoundManager.Instance.PlaySound("点击");
             Debug.Log("点击了Start");
-            Animator _animator = UITool.GetOrAddComponentInChildren<Animator>("Start");
-            _animator.SetBool("CLICK", true);
-            UITool.GetOrAddComponentInChildren<BUTTONCT>("Start").ClickStart();
+            GameObject.Find("GameRoot").GetComponent<LevelManager>().nowLevel = 1;
+            PanelManager.Pop();
+            GameRoot.Instance.SceneSystem.SetScene(new Level_1());
         });
         UITool.GetOrAddComponentInChildren<Button>("Choose").onClick.AddListener(() =>
         {
             //处理点击“选关”选项
             SoundManager.Instance.PlaySound("点击");
             Debug.Log("点击了Choose");
-            Animator _animator = UITool.GetOrAddComponentInChildren<Animator>("Choose");
-            _animator.SetBool("CLICK", true);
-            UITool.GetOrAddComponentInChildren<BUTTONCT>("Choose").ClickChoose();
-            PanelManager.Push(new SelevtLevelPanel(),true);
+            PanelManager.Push(new SelevtLevelPanel());
         });
         UITool.GetOrAddComponentInChildren<Button>("Exit").onClick.AddListener(() =>
         {
             //处理点击“退出”选项
             SoundManager.Instance.PlaySound("点击");
             Debug.Log("点击了Exit");
-            Animator _animator = UITool.GetOrAddComponentInChildren<Animator>("Exit");
-            _animator.SetBool("CLICK", true);
-            UITool.GetOrAddComponentInChildren<BUTTONCT>("Exit").ClickExit();
+            #if UNITY_EDITOR    //在编辑器模式下
+                        EditorApplication.isPlaying = false;
+            #else
+                    Application.Quit();
+            #endif
         });
     }
 }
