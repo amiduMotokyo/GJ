@@ -1573,7 +1573,52 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5305832192187342632, guid: b8ad0f57d616c3a458e6456d6a857db9, type: 3}
   m_PrefabInstance: {fileID: 3065116048288754356}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &984605664
+--- !u!61 &984605665
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984605660}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!114 &984605669
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1586,8 +1631,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bubble: []
-  Windforce: 0
-  Direction: 0
+  Windforce: 10
+  Direction: 3
 --- !u!1001 &1012478751
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1600,13 +1645,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bubble_1 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 805970931873529213, guid: aa8d2d8cfd8aa2f4d8aa92ed5a7854e1, type: 3}
+      propertyPath: m_TagString
+      value: bubble
+      objectReference: {fileID: 0}
     - target: {fileID: 3640996839917501860, guid: aa8d2d8cfd8aa2f4d8aa92ed5a7854e1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.6475382
+      value: 3.64
       objectReference: {fileID: 0}
     - target: {fileID: 3640996839917501860, guid: aa8d2d8cfd8aa2f4d8aa92ed5a7854e1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.5787131
+      value: -0.7
       objectReference: {fileID: 0}
     - target: {fileID: 3640996839917501860, guid: aa8d2d8cfd8aa2f4d8aa92ed5a7854e1, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2307,11 +2356,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 871102697048244341, guid: b8ad0f57d616c3a458e6456d6a857db9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -44
+      value: 3.49
       objectReference: {fileID: 0}
     - target: {fileID: 871102697048244341, guid: b8ad0f57d616c3a458e6456d6a857db9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 14.680973
+      value: -0.56
       objectReference: {fileID: 0}
     - target: {fileID: 871102697048244341, guid: b8ad0f57d616c3a458e6456d6a857db9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2349,13 +2398,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: windtrail
       objectReference: {fileID: 0}
+    - target: {fileID: 5305832192187342632, guid: b8ad0f57d616c3a458e6456d6a857db9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5305832192187342632, guid: b8ad0f57d616c3a458e6456d6a857db9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 984605664}
+      addedObject: {fileID: 984605665}
+    - targetCorrespondingSourceObject: {fileID: 5305832192187342632, guid: b8ad0f57d616c3a458e6456d6a857db9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 984605669}
   m_SourcePrefab: {fileID: 100100000, guid: b8ad0f57d616c3a458e6456d6a857db9, type: 3}
 --- !u!1001 &7087305335128907797
 PrefabInstance:

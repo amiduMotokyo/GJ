@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 871102697048244341}
   - component: {fileID: 9032917406512795609}
   - component: {fileID: 7941524596315923088}
+  - component: {fileID: 7907001492240985666}
   m_Layer: 0
   m_Name: windtrail
   m_TagString: Untagged
@@ -106,3 +107,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7907001492240985666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5305832192187342632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065e04e6e73564940b0cbd3e4f1a0d95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _bubble: []
+  Windforce: 0
+  Direction: 0
+  _winddir: {x: 0, y: 0}
