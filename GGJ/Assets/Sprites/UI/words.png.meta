@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 32cba456cb64c414da9e6580883938e1
+guid: 650d323fdcb9291449d5ca7fbc22b588
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,127 +97,64 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Level4-hitonside_0
+      name: words_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
+        x: 461
+        y: 226
+        width: 47
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 64f2b8baaf916904d9fc71cdeb91f9b5
-      internalID: 500635675
+      spriteID: ffdb249d02ede874ca572b12cec82176
+      internalID: 663963699
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Level4-hitonside_1
+      name: words_1
       rect:
         serializedVersion: 2
-        x: 64
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
+        x: 525
+        y: 226
+        width: 65
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a09af8f4004a33043953bde954b70011
-      internalID: -805690704
+      spriteID: 9b25e506f85caf84eb877fd595264ce2
+      internalID: 6808693
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Level4-hitonside_2
+      name: words_2
       rect:
         serializedVersion: 2
-        x: 128
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
+        x: 599
+        y: 226
+        width: 74
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e05ee07c0f9752b4384f2408c2a82d2c
-      internalID: -1999668987
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Level4-hitonside_3
-      rect:
-        serializedVersion: 2
-        x: 192
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c44c61a393529134c8e32f06f01f426a
-      internalID: -2039060410
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Level4-hitonside_4
-      rect:
-        serializedVersion: 2
-        x: 256
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 347dc22dbf1c6584581c4717438b8ce7
-      internalID: 1350977633
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Level4-hitonside_5
-      rect:
-        serializedVersion: 2
-        x: 320
-        y: 0
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4649e73e37937da44802a08c688706ab
-      internalID: -1422077387
+      spriteID: 59595daaec30b2c458706ea16c44eb7c
+      internalID: -2140644200
       vertices: []
       indices: 
       edges: []
@@ -233,12 +170,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Level4-hitonside_0: 500635675
-      Level4-hitonside_1: -805690704
-      Level4-hitonside_2: -1999668987
-      Level4-hitonside_3: -2039060410
-      Level4-hitonside_4: 1350977633
-      Level4-hitonside_5: -1422077387
+      words_0: 663963699
+      words_1: 6808693
+      words_2: -2140644200
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

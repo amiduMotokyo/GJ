@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 32cba456cb64c414da9e6580883938e1
+guid: be42610fe81cb594885d12433edad005
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -69,7 +69,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 16384
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -97,127 +97,127 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Level4-hitonside_0
+      name: Button_blue_on_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 64
-        height: 64
+        width: 960
+        height: 540
       alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
+      pivot: {x: 0.5, y: 0.44}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 64f2b8baaf916904d9fc71cdeb91f9b5
-      internalID: 500635675
+      spriteID: 968c5bc503d124041a7f7c0c982a8237
+      internalID: 1896450313
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Level4-hitonside_1
+      name: Button_blue_on_1
       rect:
         serializedVersion: 2
-        x: 64
+        x: 960
         y: 0
-        width: 64
-        height: 64
+        width: 960
+        height: 540
       alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
+      pivot: {x: 0.5, y: 0.44}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a09af8f4004a33043953bde954b70011
-      internalID: -805690704
+      spriteID: 8c6733f09dd466b4ba7e15235c633f57
+      internalID: -1000583717
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Level4-hitonside_2
+      name: Button_blue_on_2
       rect:
         serializedVersion: 2
-        x: 128
+        x: 1920
         y: 0
-        width: 64
-        height: 64
+        width: 960
+        height: 540
       alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
+      pivot: {x: 0.5, y: 0.44}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e05ee07c0f9752b4384f2408c2a82d2c
-      internalID: -1999668987
+      spriteID: 68c3789a933d6cb47971b338ade6722f
+      internalID: -969257162
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Level4-hitonside_3
+      name: Button_blue_on_3
       rect:
         serializedVersion: 2
-        x: 192
+        x: 2880
         y: 0
-        width: 64
-        height: 64
+        width: 960
+        height: 540
       alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
+      pivot: {x: 0.5, y: 0.44}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c44c61a393529134c8e32f06f01f426a
-      internalID: -2039060410
+      spriteID: d718f913059f360489b907c22deb09ca
+      internalID: -788226725
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Level4-hitonside_4
+      name: Button_blue_on_4
       rect:
         serializedVersion: 2
-        x: 256
+        x: 3840
         y: 0
-        width: 64
-        height: 64
+        width: 960
+        height: 540
       alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
+      pivot: {x: 0.5, y: 0.44}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 347dc22dbf1c6584581c4717438b8ce7
-      internalID: 1350977633
+      spriteID: dcf54ad03818a1b49af2f59ccdfdec74
+      internalID: 200560403
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Level4-hitonside_5
+      name: Button_blue_on_5
       rect:
         serializedVersion: 2
-        x: 320
+        x: 4800
         y: 0
-        width: 64
-        height: 64
+        width: 960
+        height: 540
       alignment: 9
-      pivot: {x: 0.5, y: 0.0625}
+      pivot: {x: 0.5, y: 0.44}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4649e73e37937da44802a08c688706ab
-      internalID: -1422077387
+      spriteID: 8ccf77231ad75d84fac0b15659b38f60
+      internalID: -543417721
       vertices: []
       indices: 
       edges: []
@@ -233,12 +233,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Level4-hitonside_0: 500635675
-      Level4-hitonside_1: -805690704
-      Level4-hitonside_2: -1999668987
-      Level4-hitonside_3: -2039060410
-      Level4-hitonside_4: 1350977633
-      Level4-hitonside_5: -1422077387
+      Button_blue_on_0: 1896450313
+      Button_blue_on_1: -1000583717
+      Button_blue_on_2: -969257162
+      Button_blue_on_3: -788226725
+      Button_blue_on_4: 200560403
+      Button_blue_on_5: -543417721
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
