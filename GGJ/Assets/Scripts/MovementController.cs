@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class BubbleMovementController : MonoBehaviour
+public class MovementController : MonoBehaviour
 {
     private static readonly int Horizontal = Animator.StringToHash("Horizontal");
     
@@ -13,8 +13,9 @@ public class BubbleMovementController : MonoBehaviour
     
     [Header("泡泡配置")]
     [SerializeField] private BubbleConfig bubbleConfig;
-    [SerializeField] private int currentLevel = 3;  // 默认为3级
+    [SerializeField] private int currentLevel = 3;              // 默认为3级
     private BubbleLevelConfig _currentConfig;
+    private float _originGravity;                               // 原始重力系数
     
     [Header("干燥表面设置")]
     [SerializeField] private float dryValue;                    // 当前干燥值
@@ -38,6 +39,9 @@ public class BubbleMovementController : MonoBehaviour
     private float _centerUpdateTimer;                           // 中心点更新计时器
     private const float CenterUpdateInterval = 5f;              // 中心点更新间隔
     
+    // 是否存在玩家输入
+    private bool _hasPlayerInput;
+    
     // 组件引用
     private Animator _animator;
     private Rigidbody2D _rb;
@@ -57,6 +61,10 @@ public class BubbleMovementController : MonoBehaviour
         
         // 加载当前级别的配置
         LoadLevelConfig();
+        _originGravity = _rb.gravityScale;
+        
+        // 初始化浮动中心点为当前位置
+        _floatingCenter = transform.position;
     }
 
     private void Update()
@@ -120,6 +128,7 @@ public class BubbleMovementController : MonoBehaviour
     {
         currentLevel = Mathf.Clamp(level, 1, 5);
         LoadLevelConfig();
+        _originGravity = _rb.gravityScale;
         UpdateVisuals();
     }
     
@@ -160,6 +169,9 @@ public class BubbleMovementController : MonoBehaviour
         // 处理相反方向键的情况
         if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D)) horizontal = 0f;
         if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.S)) vertical = 0f;
+        
+        // 更新输入状态
+        _hasPlayerInput = Mathf.Abs(horizontal) > 0.1f || Mathf.Abs(vertical) > 0.1f;
         
         Vector2 inputDirection = new Vector2(horizontal, vertical).normalized;
         
@@ -226,20 +238,21 @@ public class BubbleMovementController : MonoBehaviour
     private void UpdateFloatingCenter()
     {
         // 只在没有玩家输入时更新浮动中心点
-        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) < 0.1f && 
-            Mathf.Abs(Input.GetAxisRaw("Vertical")) < 0.1f)
+        if (!_hasPlayerInput)
         {
             _centerUpdateTimer += Time.fixedDeltaTime;
-            
+        
             if (_centerUpdateTimer >= CenterUpdateInterval)
             {
                 _centerUpdateTimer = 0f;
-                _floatingCenter = transform.position;
+                // 平滑地更新中心点
+                _floatingCenter = Vector2.Lerp(_floatingCenter, transform.position, 0.8f);
             }
         }
         else
         {
-            // 有输入时重置计时器
+            // 有输入时，中心点跟随当前位置，保证停止输入时从当前位置开始浮动
+            _floatingCenter = transform.position;
             _centerUpdateTimer = 0f;
         }
     }
@@ -249,6 +262,13 @@ public class BubbleMovementController : MonoBehaviour
     /// </summary>
     private void ApplyRandomForce()
     {
+        // 只在没有玩家输入时应用随机力
+        if (_hasPlayerInput)
+        {
+            _randomForceTimer = 0f;
+            return;
+        }
+        
         _randomForceTimer += Time.deltaTime;
         
         // 定期应用随机力
@@ -256,20 +276,35 @@ public class BubbleMovementController : MonoBehaviour
         {
             _randomForceTimer = 0f;
             
-            // 计算当前位置与初始位置的偏移
+            // 计算当前位置与浮动中心的偏移
             Vector2 offset = (Vector2)transform.position - _floatingCenter;
+            float offsetDistance = offset.magnitude;
             
-            // 生成随机方向的力
-            Vector2 randomDirection = Random.insideUnitCircle.normalized;
-            Vector2 finalForce = randomDirection * _currentConfig.randomForceStrength;
-            
-            // 如果偏离中心点太远，添加一个返回力
-            if (offset.magnitude > _currentConfig.maxRandomOffset)
+            // 根据偏移距离决定力的方向和大小
+            Vector2 finalForce;
+            if (offsetDistance < _currentConfig.maxRandomOffset * 0.5f)
             {
-                Vector2 returnDirection = (_floatingCenter - (Vector2)transform.position).normalized;
-                finalForce += returnDirection * _currentConfig.randomForceStrength;
+                // 在安全范围内，只施加随机力
+                finalForce = Random.insideUnitCircle.normalized * _currentConfig.randomForceStrength;
             }
+            else if (offsetDistance < _currentConfig.maxRandomOffset)
+            {
+                // 在过渡范围内，混合随机力和返回力
+                float t = (offsetDistance - _currentConfig.maxRandomOffset * 0.5f) / 
+                          (_currentConfig.maxRandomOffset * 0.5f);
             
+                Vector2 randomForce = Random.insideUnitCircle.normalized * (_currentConfig.randomForceStrength * (1 - t));
+                Vector2 returnForce = -offset.normalized * (_currentConfig.randomForceStrength * t);
+            
+                finalForce = randomForce + returnForce;
+            }
+            else
+            {
+                // 超出最大范围，只施加返回力
+                finalForce = -offset.normalized * _currentConfig.randomForceStrength;
+            }
+        
+            // 施加最终计算的力
             _rb.AddForce(finalForce, ForceMode2D.Impulse);
         }
     }
@@ -538,7 +573,7 @@ public class BubbleMovementController : MonoBehaviour
     private void DetachFromSurface()
     {
         _isAttached = false;
-        _rb.gravityScale = 1f;
+        _rb.gravityScale = _originGravity;
         
         PlayJumpSound();
     }

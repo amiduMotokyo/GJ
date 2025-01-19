@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
         _currentPlayer = Instantiate(playerPrefab, _lastSpawnPosition, Quaternion.identity);
         
         // 获取并订阅泡泡破裂事件
-        if (_currentPlayer.TryGetComponent<BubbleMovementController>(out var bubbleController))
+        if (_currentPlayer.TryGetComponent<MovementController>(out var bubbleController))
         {
             bubbleController.OnBubblePopped += OnPlayerDied;
         }

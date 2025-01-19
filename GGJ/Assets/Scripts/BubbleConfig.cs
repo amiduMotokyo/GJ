@@ -72,51 +72,51 @@ public class BubbleConfig : ScriptableObject
 
     private void SetBrownianMotionConfig(BubbleLevelConfig config)
     {
-        config.moveForce = 10f;
-        config.maxHorizontalSpeed = 5f;
-        config.maxUpwardSpeed = 5f;
-        config.maxDownwardSpeed = 5f;
+        config.moveForce = 40f;
+        config.maxHorizontalSpeed = 16f;
+        config.maxUpwardSpeed = 16f;
+        config.maxDownwardSpeed = 16f;
         config.dragFactor = 0f;
         config.buoyancyForce = 9.81f;
         config.gravityScale = 1f;
-        config.minMovementSpeed = 0.5f;
+        config.minMovementSpeed = 2f;
         config.dragThreshold = 0f;
         config.randomForceInterval = 0.2f;
-        config.randomForceStrength = 0.3f;
+        config.randomForceStrength = 0.7f;
         config.maxRandomOffset = 0.5f;
-        config.minBounceForce = 8f;
-        config.maxBounceForce = 15f;
-        config.bounceVelocityMultiplier = 1.2f;
-        config.wetSurfaceMoveSpeed = 3f;
+        config.minBounceForce = 1f;
+        config.maxBounceForce = 40f;
+        config.bounceVelocityMultiplier = 0.4f;
+        config.wetSurfaceMoveSpeed = 6f;
     }
 
     private void SetFloatingUpConfig(BubbleLevelConfig config)
     {
-        config.moveForce = 7f;
-        config.maxHorizontalSpeed = 3f;
-        config.maxUpwardSpeed = 4f;
+        config.moveForce = 16f;
+        config.maxHorizontalSpeed = 7f;
+        config.maxUpwardSpeed = 9f;
         config.maxDownwardSpeed = 2f;
         config.dragFactor = 0.3f;
         config.buoyancyForce = 12f;
         config.gravityScale = 0.8f;
-        config.minMovementSpeed = 0.3f;
+        config.minMovementSpeed = 1.5f;
         config.dragThreshold = 0.2f;
         config.randomForceInterval = 0.4f;
         config.randomForceStrength = 0.15f;
         config.maxRandomOffset = 0.3f;
-        config.minBounceForce = 5f;
-        config.maxBounceForce = 10f;
-        config.bounceVelocityMultiplier = 1f;
+        config.minBounceForce = 1f;
+        config.maxBounceForce = 14f;
+        config.bounceVelocityMultiplier = 0.4f;
         config.wetSurfaceMoveSpeed = 2f;
     }
 
     private void SetDefaultConfig(BubbleLevelConfig config)
     {
         // 使用当前BasicMovement中的默认值
-        config.moveForce = 5f;
-        config.maxHorizontalSpeed = 2f;
-        config.maxUpwardSpeed = 2f;
-        config.maxDownwardSpeed = 2f;
+        config.moveForce = 7f;
+        config.maxHorizontalSpeed = 3f;
+        config.maxUpwardSpeed = 3f;
+        config.maxDownwardSpeed = 3f;
         config.dragFactor = 0.5f;
         config.buoyancyForce = 9.81f;
         config.gravityScale = 1f;
@@ -125,9 +125,9 @@ public class BubbleConfig : ScriptableObject
         config.randomForceInterval = 0.5f;
         config.randomForceStrength = 0.1f;
         config.maxRandomOffset = 0.2f;
-        config.minBounceForce = 3f;
-        config.maxBounceForce = 8f;
-        config.bounceVelocityMultiplier = 0.8f;
+        config.minBounceForce = 1f;
+        config.maxBounceForce = 14f;
+        config.bounceVelocityMultiplier = 0.4f;
         config.wetSurfaceMoveSpeed = 1f;
     }
 
@@ -135,8 +135,8 @@ public class BubbleConfig : ScriptableObject
     {
         config.moveForce = 4f;
         config.maxHorizontalSpeed = 1.5f;
-        config.maxUpwardSpeed = 1f;
-        config.maxDownwardSpeed = 3f;
+        config.maxUpwardSpeed = 2f;
+        config.maxDownwardSpeed = 4f;
         config.dragFactor = 0.7f;
         config.buoyancyForce = 7f;
         config.gravityScale = 1.2f;
@@ -145,9 +145,9 @@ public class BubbleConfig : ScriptableObject
         config.randomForceInterval = 0.6f;
         config.randomForceStrength = 0.08f;
         config.maxRandomOffset = 0.15f;
-        config.minBounceForce = 2f;
-        config.maxBounceForce = 6f;
-        config.bounceVelocityMultiplier = 0.6f;
+        config.minBounceForce = 1f;
+        config.maxBounceForce = 14f;
+        config.bounceVelocityMultiplier = 0.4f;
         config.wetSurfaceMoveSpeed = 0.8f;
     }
 

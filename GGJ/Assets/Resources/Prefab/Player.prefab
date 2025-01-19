@@ -102,7 +102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bubbleConfig: {fileID: 11400000, guid: 229587189a8adc54c99664e450188a60, type: 2}
-  currentLevel: 3
+  currentLevel: 1
   dryValue: 0
   maxDryValue: 5
   dryRecoveryTime: 5
