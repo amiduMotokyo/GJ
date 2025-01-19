@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 160382501924041056}
   m_Layer: 0
   m_Name: Bubble_1
-  m_TagString: bubble
+  m_TagString: player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -108,6 +108,16 @@ MonoBehaviour:
   dryRecoveryTime: 3
   coyoteTime: 0.2
   doubleTapInterval: 0.25
+  bubblePrefabs:
+  - {fileID: 805970931873529213}
+  - {fileID: 8599780961545576907, guid: 0ae5c3626f5d8be4580d321f3d996b9b, type: 3}
+  - {fileID: 8571217962840367113, guid: fbdeccd899a25d242a822490059f144b, type: 3}
+  - {fileID: 7526483719265658712, guid: 4e861c749946f9d4ab5ec3d77fe427f4, type: 3}
+  - {fileID: 1142401024571394553, guid: e539e26330d205442b4140724c2801d3, type: 3}
+  freeBubblePrefab: {fileID: 6131930003768043417, guid: 27f625d5713489646ad3beea2eddd1fa, type: 3}
+  shootCooldown: 0.5
+  baseShootForce: 5
+  levelForceMultiplier: 0.5
 --- !u!95 &1027964866815945704
 Animator:
   serializedVersion: 5

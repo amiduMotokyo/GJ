@@ -6,9 +6,9 @@ public class windforce : MonoBehaviour
 {
     [SerializeField]
     private List<GameObject> _bubble;
-    [Header("·çÑ¹")]
+    [Header("ï¿½ï¿½Ñ¹")]
     public float Windforce;
-    [Header("·½Ïò")]
+    [Header("ï¿½ï¿½ï¿½ï¿½")]
     public windDirection Direction;
     private Vector2 _winddir;
 
@@ -28,10 +28,10 @@ public class windforce : MonoBehaviour
     {
         switch (dir)
         {
-            case windDirection.ÓÒ: transform.localEulerAngles = new Vector3(0, 0, 0); _winddir = Vector2.right ; break;
-            case windDirection.×ó: transform.localEulerAngles = new Vector3(0, 180, 0); _winddir = Vector2.left; break;
-            case windDirection.ÏÂ: transform.localEulerAngles = new Vector3(0, 0, -90); _winddir = Vector2.down; break;
-            case windDirection.ÉÏ: transform.localEulerAngles = new Vector3(0, 0, 90); _winddir = Vector2.up; break;
+            case windDirection.Right: transform.localEulerAngles = new Vector3(0, 0, 0); _winddir = Vector2.right ; break;
+            case windDirection.Left: transform.localEulerAngles = new Vector3(0, 180, 0); _winddir = Vector2.left; break;
+            case windDirection.Down: transform.localEulerAngles = new Vector3(0, 0, -90); _winddir = Vector2.down; break;
+            case windDirection.Up: transform.localEulerAngles = new Vector3(0, 0, 90); _winddir = Vector2.up; break;
         }
     }
 
@@ -41,7 +41,7 @@ public class windforce : MonoBehaviour
         {
             for(var i=0; i < _bubble.Count;i++)
             {
-                Debug.Log("move");
+                Debug.Log("Add force");
                 var rb = _bubble[i].GetComponent<Rigidbody2D>();
                 rb.AddForce(_winddir);
             }
@@ -68,8 +68,8 @@ public class windforce : MonoBehaviour
 
 public enum windDirection
 {
-    ÉÏ,
-    ÏÂ,
-    ×ó,
-    ÓÒ
+    Up,
+    Down,
+    Left,
+    Right
 }

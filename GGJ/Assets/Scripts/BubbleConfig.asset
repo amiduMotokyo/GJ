@@ -13,10 +13,42 @@ MonoBehaviour:
   m_Name: BubbleConfig
   m_EditorClassIdentifier: 
   levelConfigs:
-  - moveForce: 5
-    maxHorizontalSpeed: 2
-    maxUpwardSpeed: 2
+  - moveForce: 40
+    maxHorizontalSpeed: 16
+    maxUpwardSpeed: 16
+    maxDownwardSpeed: 16
+    dragFactor: 0
+    buoyancyForce: 9.81
+    gravityScale: 1
+    minMovementSpeed: 2
+    dragThreshold: 0
+    randomForceInterval: 0.2
+    randomForceStrength: 0.7
+    maxRandomOffset: 0.5
+    minBounceForce: 1
+    maxBounceForce: 40
+    bounceVelocityMultiplier: 0.4
+    wetSurfaceMoveSpeed: 6
+  - moveForce: 16
+    maxHorizontalSpeed: 7
+    maxUpwardSpeed: 9
     maxDownwardSpeed: 2
+    dragFactor: 0.3
+    buoyancyForce: 12
+    gravityScale: 0.8
+    minMovementSpeed: 1.5
+    dragThreshold: 0.2
+    randomForceInterval: 0.4
+    randomForceStrength: 0.15
+    maxRandomOffset: 0.3
+    minBounceForce: 1
+    maxBounceForce: 14
+    bounceVelocityMultiplier: 0.4
+    wetSurfaceMoveSpeed: 2
+  - moveForce: 7
+    maxHorizontalSpeed: 3
+    maxUpwardSpeed: 3
+    maxDownwardSpeed: 3
     dragFactor: 0.5
     buoyancyForce: 9.81
     gravityScale: 1
@@ -25,71 +57,39 @@ MonoBehaviour:
     randomForceInterval: 0.5
     randomForceStrength: 0.1
     maxRandomOffset: 0.2
-    minBounceForce: 3
-    maxBounceForce: 8
-    bounceVelocityMultiplier: 0.8
+    minBounceForce: 1
+    maxBounceForce: 14
+    bounceVelocityMultiplier: 0.4
     wetSurfaceMoveSpeed: 1
-  - moveForce: 5
-    maxHorizontalSpeed: 2
+  - moveForce: 4
+    maxHorizontalSpeed: 1.5
     maxUpwardSpeed: 2
-    maxDownwardSpeed: 2
-    dragFactor: 0.5
-    buoyancyForce: 9.81
-    gravityScale: 1
-    minMovementSpeed: 0.2
-    dragThreshold: 0.3
-    randomForceInterval: 0.5
-    randomForceStrength: 0.1
-    maxRandomOffset: 0.2
-    minBounceForce: 3
-    maxBounceForce: 8
-    bounceVelocityMultiplier: 0.8
-    wetSurfaceMoveSpeed: 1
-  - moveForce: 5
-    maxHorizontalSpeed: 2
-    maxUpwardSpeed: 2
-    maxDownwardSpeed: 2
-    dragFactor: 0.5
-    buoyancyForce: 9.81
-    gravityScale: 1
-    minMovementSpeed: 0.2
-    dragThreshold: 0.3
-    randomForceInterval: 0.5
-    randomForceStrength: 0.1
-    maxRandomOffset: 0.2
-    minBounceForce: 3
-    maxBounceForce: 8
-    bounceVelocityMultiplier: 0.8
-    wetSurfaceMoveSpeed: 1
-  - moveForce: 5
-    maxHorizontalSpeed: 2
-    maxUpwardSpeed: 2
-    maxDownwardSpeed: 2
-    dragFactor: 0.5
-    buoyancyForce: 9.81
-    gravityScale: 1
-    minMovementSpeed: 0.2
-    dragThreshold: 0.3
-    randomForceInterval: 0.5
-    randomForceStrength: 0.1
-    maxRandomOffset: 0.2
-    minBounceForce: 3
-    maxBounceForce: 8
-    bounceVelocityMultiplier: 0.8
-    wetSurfaceMoveSpeed: 1
-  - moveForce: 5
-    maxHorizontalSpeed: 2
-    maxUpwardSpeed: 2
-    maxDownwardSpeed: 2
-    dragFactor: 0.5
-    buoyancyForce: 9.81
-    gravityScale: 1
-    minMovementSpeed: 0.2
-    dragThreshold: 0.3
-    randomForceInterval: 0.5
-    randomForceStrength: 0.1
-    maxRandomOffset: 0.2
-    minBounceForce: 3
-    maxBounceForce: 8
-    bounceVelocityMultiplier: 0.8
-    wetSurfaceMoveSpeed: 1
+    maxDownwardSpeed: 4
+    dragFactor: 0.7
+    buoyancyForce: 7
+    gravityScale: 1.2
+    minMovementSpeed: 0.15
+    dragThreshold: 0.4
+    randomForceInterval: 0.6
+    randomForceStrength: 0.08
+    maxRandomOffset: 0.15
+    minBounceForce: 1
+    maxBounceForce: 14
+    bounceVelocityMultiplier: 0.4
+    wetSurfaceMoveSpeed: 0.8
+  - moveForce: 2
+    maxHorizontalSpeed: 1
+    maxUpwardSpeed: 0.5
+    maxDownwardSpeed: 5
+    dragFactor: 1
+    buoyancyForce: 4
+    gravityScale: 1.5
+    minMovementSpeed: 0.1
+    dragThreshold: 0.5
+    randomForceInterval: 0.8
+    randomForceStrength: 0.05
+    maxRandomOffset: 0.1
+    minBounceForce: 1
+    maxBounceForce: 4
+    bounceVelocityMultiplier: 0.4
+    wetSurfaceMoveSpeed: 0.5

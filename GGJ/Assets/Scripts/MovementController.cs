@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(Rigidbody2D), typeof(Animator), typeof(Collider2D))]
 public class MovementController : MonoBehaviour
 {
     public event Action OnBubblePopped;                  // 泡泡破裂事件
@@ -30,6 +31,21 @@ public class MovementController : MonoBehaviour
     private float _coyoteTimeCounter;                           // 缓冲时间计数器
     private float _lastTapTime;                                 // 上次按键时间
     private bool _isFirstTap;                                   // 是否是第一次按键
+    
+    [Header("预制体引用")]
+    [SerializeField] private GameObject[] bubblePrefabs;        // 不同等级泡泡的预制体数组
+    
+    [Header("吸收系统")]
+    private bool _isAbsorbing = false;                          // 是否正在吸收中
+    private int _absorptionCount = 0;                           // 当前吸收的泡泡数量
+    private bool _pendingDestruction = false;                   // 是否等待销毁（五级吸收后）
+    
+    [Header("发射系统")]
+    [SerializeField] private GameObject freeBubblePrefab;       // 自由泡泡预制体
+    [SerializeField] private float shootCooldown = 0.5f;        // 发射冷却时间
+    [SerializeField] private float baseShootForce = 5f;         // 基础发射力度
+    [SerializeField] private float levelForceMultiplier = 0.5f; // 等级对发射力的影响系数
+    private float _shootTimer;                                  // 发射计时器
     
     // 随机浮动相关
     private Vector2 _floatingCenter;                            // 浮动中心点
@@ -73,6 +89,7 @@ public class MovementController : MonoBehaviour
     private void Update()
     {
         HandleInput();
+        HandleShooting();
         UpdateAnimations();
         DryValueRecover();
     }
@@ -132,7 +149,6 @@ public class MovementController : MonoBehaviour
         currentLevel = Mathf.Clamp(level, 1, 5);
         LoadLevelConfig();
         _originGravity = _rb.gravityScale;
-        UpdateVisuals();
     }
     
     private void LoadLevelConfig()
@@ -141,6 +157,173 @@ public class MovementController : MonoBehaviour
         _rb.gravityScale = _currentConfig.gravityScale;
     }
     
+    #endregion
+
+    #region Absorb & Shooting System
+
+    /// <summary>
+    /// 处理泡泡吸收
+    /// </summary>
+    public void AbsorbBubble(FreeBubble bubble)
+    {
+        if (_pendingDestruction) return;  // 如果已经触发销毁，不再吸收
+    
+        // 记录当前状态
+        Vector2 currentVelocity = _rb.velocity;
+        Vector3 currentPosition = transform.position;
+        Vector3 currentRotation = transform.eulerAngles;
+    
+        // 增加吸收计数
+        _absorptionCount++;
+    
+        // 销毁被吸收的泡泡
+        bubble.DestroyImmediately();
+    
+        if (!_isAbsorbing)
+        {
+            // 开始新的吸收过程
+            _isAbsorbing = true;
+            StartCoroutine(AbsorptionProcess(currentVelocity, currentPosition, currentRotation));
+        }
+    }
+    
+    /// <summary>
+    /// 吸收过程
+    /// </summary>
+    private IEnumerator AbsorptionProcess(Vector2 originalVelocity, Vector3 originalPosition, Vector3 originalRotation)
+    {
+        // 触发吸收动画
+        _animator.SetTrigger("merge");
+        
+        // 等待直到进入merge动画状态
+        float timeout = 0f;
+        while (!_animator.GetCurrentAnimatorStateInfo(0).IsName("merge") && timeout < 1f)
+        {
+            timeout += Time.deltaTime;
+            yield return null;
+        }
+    
+        if (timeout >= 1f)
+        {
+            Debug.LogWarning("等待进入merge动画状态超时");
+            // 继续执行，不要卡住
+        }
+    
+        // 等待动画播放完成
+        yield return new WaitForSeconds(_animator.GetCurrentAnimatorStateInfo(0).length);
+
+        // 计算最终等级
+        int finalLevel = currentLevel + _absorptionCount;
+    
+        if (finalLevel > 5)
+        {
+            // 如果最终等级超过5，生成5级泡泡并标记待销毁
+            _pendingDestruction = true;
+            finalLevel = 5;
+        }
+
+        // 实例化新的泡泡预制体
+        GameObject newBubble = Instantiate(bubblePrefabs[finalLevel - 1], originalPosition, Quaternion.Euler(originalRotation));
+    
+        // 设置新泡泡的速度
+        if (newBubble.TryGetComponent<Rigidbody2D>(out var newRb))
+        {
+            newRb.velocity = originalVelocity;
+        }
+        
+        // 处理五级泡泡的特殊情况
+        if (_pendingDestruction)
+        {
+            if (newBubble.TryGetComponent<MovementController>(out var newController))
+            {
+                // 在新泡泡上启动协程
+                newController.StartPopAfterSpawn();
+            }
+        }
+
+        // 销毁原始泡泡
+        Destroy(gameObject);
+    }
+    
+    /// <summary>
+    /// 在新泡泡上启动破裂协程
+    /// </summary>
+    public void StartPopAfterSpawn()
+    {
+        StartCoroutine(PopAfterSpawn(this));
+    }
+    
+    private IEnumerator PopAfterSpawn(MovementController bubble)
+    {
+        yield return null; // 等待一帧确保完全初始化
+        bubble.TriggerPop();
+    }
+    
+    /// <summary>
+    /// 外部调用触发破裂
+    /// </summary>
+    public void TriggerPop()
+    {
+        PopBubble();
+    }
+    
+    private void HandleShooting()
+    {
+        // 一级泡泡不能发射
+        if (currentLevel <= 1) return;
+
+        // 更新发射计时器
+        if (_shootTimer > 0)
+        {
+            _shootTimer -= Time.deltaTime;
+            return;
+        }
+
+        // 检测发射输入
+        if (Input.GetMouseButtonDown(0))
+        {
+            // 保存当前状态用于创建新泡泡
+            Vector2 currentVelocity = _rb.velocity;
+            Vector3 currentPosition = transform.position;
+            Vector3 currentRotation = transform.eulerAngles;
+            int newLevel = currentLevel - 1;  // 降级
+            
+            // 获取鼠标位置和发射方向
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mousePosition.z = 0; // 确保在2D平面上
+            Vector2 shootDirection = ((Vector2)(mousePosition - transform.position)).normalized;
+
+            // 计算发射力度（随等级增加而增加）
+            float shootForce = baseShootForce + (currentLevel - 1) * levelForceMultiplier;
+
+            // 实例化并初始化自由泡泡
+            GameObject bubble = Instantiate(freeBubblePrefab, transform.position + (Vector3)(shootDirection * 0.5f), Quaternion.identity);
+            if (bubble.TryGetComponent<FreeBubble>(out var freeBubble))
+            {
+                freeBubble.InitializeAsProjectile(shootDirection * shootForce);
+            }
+
+            // 触发发射动画
+            _animator.SetTrigger("split");
+
+            // 播放发射音效
+            PlayShootSound();
+        
+            // 重置冷却时间
+            _shootTimer = shootCooldown;
+            
+            // 创建降级后的新泡泡
+            GameObject newBubble = Instantiate(bubblePrefabs[newLevel - 1], currentPosition, Quaternion.Euler(currentRotation));
+            if (newBubble.TryGetComponent<Rigidbody2D>(out var newRb))
+            {
+                newRb.velocity = currentVelocity;
+            }
+            
+            // 销毁当前泡泡
+            Destroy(gameObject);
+        }
+    }
+
     #endregion
     
     #region Movement System
@@ -366,13 +549,12 @@ public class MovementController : MonoBehaviour
         {
             // 获取碰撞点信息
             ContactPoint2D contact = collision.GetContact(0);
-            Vector2 normal = contact.normal;
             
             // 使用碰撞的相对速度
             float impactVelocity = collision.relativeVelocity.magnitude;
             
             // 判断主要的碰撞方向
-            bool isHorizontalCollision = Mathf.Abs(normal.x) > Mathf.Abs(normal.y);
+            bool isHorizontalCollision = Mathf.Abs(contact.normal.x) > Mathf.Abs(contact.normal.y);
             
             // 触发对应方向的撞击动画
             _animator.SetTrigger(isHorizontalCollision ? "side" : "top");
@@ -380,7 +562,7 @@ public class MovementController : MonoBehaviour
             // 根据碰撞方向选择参考速度
             float maxReferenceSpeed = isHorizontalCollision 
                 ? _currentConfig.maxHorizontalSpeed
-                : (normal.y > 0 ? _currentConfig.maxDownwardSpeed : _currentConfig.maxUpwardSpeed);
+                : (contact.normal.y > 0 ? _currentConfig.maxDownwardSpeed : _currentConfig.maxUpwardSpeed);
             
             // 基于相对速度计算反弹力度，并限制在最大最小值之间
             float velocityFactor = Mathf.Clamp01(impactVelocity / maxReferenceSpeed); // 将速度标准化到0-1范围
@@ -689,12 +871,6 @@ public class MovementController : MonoBehaviour
     
     #region Visual and Audio
     
-    private void UpdateVisuals()
-    {
-        // TODO: 根据当前级别更新Sprite和动画
-        //_animator.SetInteger("BubbleLevel", currentLevel);
-    }
-    
     /// <summary>
     /// 更新动画状态
     /// </summary>
@@ -722,11 +898,13 @@ public class MovementController : MonoBehaviour
     /// <summary>
     /// 处理泡泡破裂效果
     /// </summary>
-    private void PopBubble()
+    protected virtual void PopBubble()
     {
         // 禁用控制
         enabled = false;
     
+        // 将刚体改为运动学模式，不再受物理影响
+        _rb.isKinematic = true;
         // 清除所有速度
         _rb.velocity = Vector2.zero;
         _rb.angularVelocity = 0f;
@@ -749,9 +927,6 @@ public class MovementController : MonoBehaviour
     /// </summary>
     private IEnumerator DestroyAfterAnimation()
     {
-        // 等待一帧确保动画状态切换完成
-        yield return null;
-    
         // 等待直到进入破裂动画状态
         float timeout = 0f;
         while (!_animator.GetCurrentAnimatorStateInfo(0).IsName("explode") && timeout < 1f)
@@ -763,7 +938,7 @@ public class MovementController : MonoBehaviour
         if (timeout >= 1f)
         {
             Debug.LogWarning("等待进入破裂动画状态超时");
-            gameObject.SetActive(false);
+            Destroy(gameObject);
             yield break;
         }
     
@@ -772,17 +947,17 @@ public class MovementController : MonoBehaviour
         yield return new WaitForSeconds(animationLength);
     
         // 销毁对象
-        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
     
     private void PlayBounceSound()
     {
-        // AudioManager.Instance.PlaySound("BubbleBounce", pitch);
+        // AudioManager.Instance.PlaySound("BubbleBounce");
     }
 
     private void PlayJumpSound()
     {
-        // AudioManager.Instance.PlaySound("BubbleJump", pitch);
+        // AudioManager.Instance.PlaySound("BubbleJump");
     }
 
     private void PlayWetSurfaceSound()
@@ -793,6 +968,12 @@ public class MovementController : MonoBehaviour
     private void PlayPopSound()
     {
         // AudioManager.Instance.PlaySound("BubblePop");
+    }
+    
+    private void PlayShootSound()
+    {
+        // AudioManager.Instance.PlaySound("BubbleShoot");
+        // 我日你妈
     }
     
     #endregion
