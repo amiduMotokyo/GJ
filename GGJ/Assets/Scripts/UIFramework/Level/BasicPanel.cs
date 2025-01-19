@@ -11,6 +11,7 @@ public class BasicPanel : BasePanel
 
     public override void OnEnter()
     {
+        SoundManager.Instance.PlayBgm("BGM");
         UITool.GetOrAddComponentInChildren<Button>("Menu").onClick.AddListener(() =>
         {
             //处理点击“菜单”选项

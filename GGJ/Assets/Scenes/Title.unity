@@ -723,7 +723,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1988584512}
   - component: {fileID: 1988584511}
-  - component: {fileID: 1988584513}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -743,9 +742,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b2f03c89003dae42a23f3c6fedb9f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bgm_List: []
+  bgm_List:
+  - audioClip: {fileID: 8300000, guid: e513afdaa3b82164ca49df19aa47c466, type: 3}
+    soundName: BGM
   sound_List:
-  - audioClip: {fileID: 8300000, guid: fa1faf911c0fc87448da3a200f72be2b, type: 3}
+  - audioClip: {fileID: 8300000, guid: 742b4d97e9eaa074999b0f257cdd033a, type: 3}
     soundName: "\u70B9\u51FB"
 --- !u!4 &1988584512
 Transform:
@@ -762,27 +763,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &1988584513
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1988584510}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: bf21611162729e94f8ee48a334d91549, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

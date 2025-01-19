@@ -10,6 +10,7 @@ public class SelectionPanel : BasePanel
     public SelectionPanel() : base(new UIType(path)) { }
     public override void OnEnter()
     {
+        SoundManager.Instance.PlayBgm("BGM");
         UITool.GetOrAddComponentInChildren<Button>("Start").onClick.AddListener(() =>
         {
             //处理点击“开始”选项

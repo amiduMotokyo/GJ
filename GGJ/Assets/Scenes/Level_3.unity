@@ -252,9 +252,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b2f03c89003dae42a23f3c6fedb9f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bgm_List: []
+  bgm_List:
+  - audioClip: {fileID: 8300000, guid: e513afdaa3b82164ca49df19aa47c466, type: 3}
+    soundName: BGM
   sound_List:
-  - audioClip: {fileID: 8300000, guid: fa1faf911c0fc87448da3a200f72be2b, type: 3}
+  - audioClip: {fileID: 8300000, guid: 742b4d97e9eaa074999b0f257cdd033a, type: 3}
     soundName: "\u70B9\u51FB"
 --- !u!4 &915748451
 Transform:
