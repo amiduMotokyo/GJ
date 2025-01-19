@@ -35,15 +35,24 @@ public class PanelManager
         }
         stackPanel.Push(nextPanel);
         GameObject panelGameObject = uiManager.GetSingleUI(nextPanel.UIType);
-        //把所有对象的初始透明度变成0
+        //把所有对象的初始状态隐藏
         if(isTransparent == true)
         {
-            if (panelGameObject.GetComponent<Image>())
-                panelGameObject.GetComponent<Image>().color = new Color(panelGameObject.GetComponent<Image>().color.r, panelGameObject.GetComponent<Image>().color.g, panelGameObject.GetComponent<Image>().color.b, 0);
+            //if (panelGameObject.GetComponent<Image>())
+            //    panelGameObject.GetComponent<Image>().color = new Color(panelGameObject.GetComponent<Image>().color.r, panelGameObject.GetComponent<Image>().color.g, panelGameObject.GetComponent<Image>().color.b, 0);
+            //foreach (Transform child in panelGameObject.transform)
+            //{
+            //    if (child.GetComponent<Image>())
+            //        child.GetComponent<Image>().color = new Color(child.GetComponent<Image>().color.r, child.GetComponent<Image>().color.g, child.GetComponent<Image>().color.b, 0);
+            //}
             foreach (Transform child in panelGameObject.transform)
             {
-                if (child.GetComponent<Image>())
-                    child.GetComponent<Image>().color = new Color(child.GetComponent<Image>().color.r, child.GetComponent<Image>().color.g, child.GetComponent<Image>().color.b, 0);
+                CanvasGroup canvasGroup = child.GetComponent<CanvasGroup>();
+                if (!canvasGroup)
+                {
+                    canvasGroup = child.gameObject.AddComponent<CanvasGroup>();
+                }
+                canvasGroup.alpha = 0;
             }
         }
         nextPanel.Initialize(new UITool(panelGameObject));

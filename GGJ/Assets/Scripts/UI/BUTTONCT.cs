@@ -48,8 +48,14 @@ public class BUTTONCT : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         yield return new WaitForSeconds(_animator.GetCurrentAnimatorStateInfo(0).length);
         foreach(Transform child in GameObject.Find("SelevtLevelPanel").transform)
         {
-            if (child.GetComponent<Image>())
-                child.GetComponent<Image>().color = new Color(child.GetComponent<Image>().color.r, child.GetComponent<Image>().color.g, child.GetComponent<Image>().color.b, 255);
+            //if (child.GetComponent<Image>())
+            //    child.GetComponent<Image>().color = new Color(child.GetComponent<Image>().color.r, child.GetComponent<Image>().color.g, child.GetComponent<Image>().color.b, 255);
+            CanvasGroup canvasGroup = child.GetComponent<CanvasGroup>();
+            if (!canvasGroup)
+            {
+                canvasGroup = child.gameObject.AddComponent<CanvasGroup>();
+            }
+            canvasGroup.alpha = 1;
         }
     }
     IEnumerator PlayAnimationEnd_Exit()

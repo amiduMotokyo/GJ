@@ -17,7 +17,6 @@ public class SelevtLevelPanel : BasePanel
             SoundManager.Instance.PlaySound("点击");
             Debug.Log("点击了开始游戏");
             GameObject.Find("GameRoot").GetComponent<LevelManager>().nowLevel = UITool.GetGameObject().GetComponent<LevelSelectManager>().SelectedLevel;
-            PanelManager.Pop();
             switch (UITool.GetGameObject().GetComponent<LevelSelectManager>().SelectedLevel)
             {
                 case 1:
@@ -44,6 +43,7 @@ public class SelevtLevelPanel : BasePanel
             if(UITool.GetGameObject().GetComponent<LevelSelectManager>().SelectedLevel < 4)
             {
                 UITool.GetGameObject().GetComponent<LevelSelectManager>().SelectedLevel++;
+                UITool.GetGameObject().transform.GetChild(0).GetComponent<Image>().sprite = UITool.GetGameObject().GetComponent<LevelSelectManager>().background_3;
             }
             UITool.GetGameObject().GetComponent<LevelSelectManager>().Refresh();
         });
@@ -55,6 +55,7 @@ public class SelevtLevelPanel : BasePanel
             if (UITool.GetGameObject().GetComponent<LevelSelectManager>().SelectedLevel > 1)
             {
                 UITool.GetGameObject().GetComponent<LevelSelectManager>().SelectedLevel--;
+                UITool.GetGameObject().transform.GetChild(0).GetComponent<Image>().sprite = UITool.GetGameObject().GetComponent<LevelSelectManager>().background_2;
             }
             UITool.GetGameObject().GetComponent<LevelSelectManager>().Refresh();
         });
