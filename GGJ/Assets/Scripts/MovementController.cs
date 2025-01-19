@@ -5,8 +5,6 @@ using Random = UnityEngine.Random;
 
 public class MovementController : MonoBehaviour
 {
-    private static readonly int Horizontal = Animator.StringToHash("Horizontal");
-    
     public event Action OnBubblePopped;                  // 泡泡破裂事件
     
     #region Variable Declarations
@@ -21,17 +19,17 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float dryValue;                    // 当前干燥值
     [SerializeField] private float maxDryValue = 5f;            // 最大干燥值
     [SerializeField] private float dryRecoveryTime = 3f;        // 干燥值恢复所需时间
-    private float _dryRecoveryTimer;                      // 干燥值恢复计时器
-    private bool _canBounce = true;                       // 是否可以反弹
+    private float _dryRecoveryTimer;                            // 干燥值恢复计时器
+    private bool _canBounce = true;                             // 是否可以反弹
     
     [Header("湿润表面设置")]
-    [SerializeField] private float coyoteTime = 0.2f;         // 缓冲时间
-    [SerializeField] private float doubleTapInterval = 0.25f; // 双击时间间隔
-    private bool _isAttached;                                 // 是否吸附在表面上
-    private Vector2 _attachedNormal;                          // 吸附表面的法线方向
-    private float _coyoteTimeCounter;                         // 缓冲时间计数器
-    private float _lastTapTime;                               // 上次按键时间
-    private bool _isFirstTap;                                 // 是否是第一次按键
+    [SerializeField] private float coyoteTime = 0.2f;           // 缓冲时间
+    [SerializeField] private float doubleTapInterval = 0.25f;   // 双击时间间隔
+    private bool _isAttached;                                   // 是否吸附在表面上
+    private Vector2 _attachedNormal;                            // 吸附表面的法线方向
+    private float _coyoteTimeCounter;                           // 缓冲时间计数器
+    private float _lastTapTime;                                 // 上次按键时间
+    private bool _isFirstTap;                                   // 是否是第一次按键
     
     // 随机浮动相关
     private Vector2 _floatingCenter;                            // 浮动中心点
@@ -48,6 +46,11 @@ public class MovementController : MonoBehaviour
     private ColliderCheck _colliderCheck;
     private SpriteRenderer _spriteRenderer;
 
+    // 常数
+    private const float InputThreshold = 0.1f;
+    private const float DetachmentDotThreshold = 0.7f;
+    private const float BounceCooldown = 0.1f;
+    
     #endregion
     
     #region Unity Lifecycle
@@ -331,10 +334,10 @@ public class MovementController : MonoBehaviour
     /// </summary>
     private void UpdateFacingDirection(float direction)
     {
-        if (direction == 0) return;
-        
+        if (direction == 0 || _isAttached) return;
+    
         transform.localEulerAngles = direction < 0 
-            ? new Vector3(0.0f, 180.0f, 0.0f)
+            ? new Vector3(0f, 180f, 0f)
             : Vector3.zero;
     }
     
@@ -443,7 +446,7 @@ public class MovementController : MonoBehaviour
     private IEnumerator BounceDelay()
     {
         _canBounce = false;
-        yield return new WaitForSeconds(0.1f); // 设置反弹冷却时间
+        yield return new WaitForSeconds(BounceCooldown); // 设置反弹冷却时间
         _canBounce = true;
     }
     
@@ -458,21 +461,49 @@ public class MovementController : MonoBehaviour
     {
         if (_isAttached) return; // 已经吸附则不处理
         
+        ContactPoint2D contact = collision.GetContact(0);
+        if (contact.normal == Vector2.zero) return; // 防止无效的法线
+        
         // 设置吸附状态
         _isAttached = true;
-        _attachedNormal = collision.GetContact(0).normal;
+        _attachedNormal = contact.normal;
+
+        SpriteRotation(_attachedNormal);
         
         // 清除现有的速度和角速度
         _rb.velocity = Vector2.zero;
         _rb.angularVelocity = 0f;
         
-        // 改变重力缩放以减弱重力影响
-        _rb.gravityScale /= 2f;
+        // 根据表面方向调整重力
+        AdjustGravityScale(_attachedNormal);
         
         PlayWetSurfaceSound();
         ResetDryValue();
     }
     
+    private void AdjustGravityScale(Vector2 normal)
+    {
+        // 法线与上方向的点积绝对值接近1表示水平表面，接近0表示垂直表面
+        float verticalAlignment = Mathf.Abs(Vector2.Dot(normal, Vector2.up));
+    
+        if (verticalAlignment > 0.9f) // 水平表面
+        {
+            _rb.gravityScale = 0f;
+        }
+        else if (verticalAlignment < 0.1f) // 垂直表面
+        {
+            _rb.gravityScale = _originGravity * 0.5f;
+        }
+        else // 斜面
+        {
+            // 在垂直和水平之间线性插值
+            // verticalAlignment为0时是0.5倍重力（垂直表面）
+            // verticalAlignment为1时是0倍重力（水平表面）
+            float gravityFactor = Mathf.Lerp(0.5f, 0f, verticalAlignment);
+            _rb.gravityScale = _originGravity * gravityFactor;
+        }
+    }
+
     /// <summary>
     /// 保持吸附状态
     /// </summary>
@@ -521,46 +552,92 @@ public class MovementController : MonoBehaviour
         
         // 检查是否需要脱离表面
         CheckDetachment(inputDirection);
-        
-        // 处理图像翻转
-        UpdateFacingDirection(horizontal);
+
+        // 更新朝向
+        UpdateAttachedFacingDirection(moveInput, _attachedNormal);
     }
     
+    private void UpdateAttachedFacingDirection(float moveInput, Vector2 normal)
+    {
+        if (Mathf.Abs(moveInput) < 0.1f) return;
+
+        // 判断表面的主要方向
+        bool isVerticalSurface = Mathf.Abs(normal.x) > Mathf.Abs(normal.y);
+    
+        if (isVerticalSurface)
+        {
+            // 在垂直表面上移动时的翻转
+            bool isRightSurface = normal.x > 0;
+            bool shouldFlipVertically = isRightSurface ? 
+                (moveInput < 0) != (normal.x > 0) : // 向右的表面：向上翻转
+                (moveInput > 0) != (normal.x > 0);  // 向左的表面：向下翻转
+            
+            transform.localEulerAngles = new Vector3(
+                shouldFlipVertically ? 180f : 0f,
+                0f,
+                normal.x > 0 ? -90f : 90f
+            );
+        }
+        else
+        {
+            // 检查是否是向下的表面
+            bool isUpsideDown = normal.y < 0;
+            
+            // 在水平表面上，根据左右移动翻转
+            // 如果是倒立状态，需要反转移动方向的判断
+            bool shouldFlipHorizontally = isUpsideDown ? 
+                (moveInput < 0) != (normal.y < 0) : 
+                (moveInput > 0) != (normal.y < 0);
+            
+            transform.localEulerAngles = new Vector3(
+                0f,
+                shouldFlipHorizontally ? 180f : 0f,
+                normal.y > 0 ? 0f : 180f
+            );
+        }
+    }
+    
+    /// <summary>
+    /// 检查是否需要从湿润表面脱离
+    /// </summary>
+    /// <param name="inputDirection">玩家的输入方向向量</param>
     private void CheckDetachment(Vector2 inputDirection)
     {
-        // 检查输入方向是否与表面法线方向匹配
+        // 计算输入方向与表面法线的点积，用于判断输入是否指向远离表面的方向
+        // 点积为正表示输入方向与法线方向大致相同（指向远离表面的方向）
         float dotProduct = Vector2.Dot(inputDirection, _attachedNormal);
-        bool keyPressed = false;
-        
-        // 检测按键
-        if (inputDirection.x != 0)
-        {
-            keyPressed = inputDirection.x > 0 ? Input.GetKeyDown(KeyCode.D) : Input.GetKeyDown(KeyCode.A);
-        }
-        if (inputDirection.y != 0)
-        {
-            keyPressed = keyPressed || (inputDirection.y > 0 ? Input.GetKeyDown(KeyCode.W) : Input.GetKeyDown(KeyCode.S));
-        }
-        
-        if (dotProduct > 0.7f && keyPressed)
+    
+        // 如果没有足够的输入强度，直接返回
+        if (inputDirection.magnitude < InputThreshold) return;
+    
+        // 检测与输入方向对应的按键是否被按下
+        bool keyPressed = (inputDirection.x != 0 && Input.GetKeyDown(inputDirection.x > 0 ? KeyCode.D : KeyCode.A)) ||
+                          (inputDirection.y != 0 && Input.GetKeyDown(inputDirection.y > 0 ? KeyCode.W : KeyCode.S));
+    
+        // 当输入方向足够接近法线方向（点积>阈值）且对应按键被按下时
+        if (dotProduct > DetachmentDotThreshold && keyPressed)
         {
             float currentTime = Time.time;
         
+            // 如果是第一次按键
             if (!_isFirstTap)
             {
                 _isFirstTap = true;
                 _lastTapTime = currentTime;
             }
+            // 如果是双击（在规定时间间隔内的第二次按键）
             else if (currentTime - _lastTapTime <= doubleTapInterval)
             {
-                DetachFromSurface();
-                _isFirstTap = false;
+                DetachFromSurface();  // 脱离表面
+                _isFirstTap = false;  // 重置第一次按键状态
             }
+            // 如果超过了双击时间间隔，视为新的第一次按键
             else
             {
                 _lastTapTime = currentTime;
             }
         }
+        // 如果按下了不符合脱离条件的按键，重置第一次按键状态
         else if (keyPressed)
         {
             _isFirstTap = false;
@@ -572,11 +649,37 @@ public class MovementController : MonoBehaviour
     /// </summary>
     private void DetachFromSurface()
     {
+        // 根据表面法线判断应该触发哪种跳跃动画
+        bool isVerticalSurface = Mathf.Abs(_attachedNormal.x) > Mathf.Abs(_attachedNormal.y);
+        
+        if (isVerticalSurface)
+        {
+            // 在垂直表面上，触发垂直跳跃
+            _animator.SetTrigger("verticaljump");
+        }
+        else
+        {
+            // 在水平表面上，触发水平跳跃
+            _animator.SetTrigger("horizontaljump");
+        }
+        
         _isAttached = false;
         _rb.gravityScale = _originGravity;
         
+        // 获取当前的法线方向，用于决定脱离后的朝向
+        bool shouldFaceLeft = _attachedNormal.x > 0;
+        transform.localEulerAngles = shouldFaceLeft ? 
+            new Vector3(0f, 180f, 0f) : 
+            Vector3.zero;
+        
         PlayJumpSound();
     }
+    
+    #endregion
+
+    #region Public Methods
+    
+    public int GetCurrentLevel() => currentLevel;
     
     #endregion
     
@@ -585,7 +688,7 @@ public class MovementController : MonoBehaviour
     private void UpdateVisuals()
     {
         // TODO: 根据当前级别更新Sprite和动画
-        _animator.SetInteger("BubbleLevel", currentLevel);
+        //_animator.SetInteger("BubbleLevel", currentLevel);
     }
     
     /// <summary>
@@ -593,9 +696,7 @@ public class MovementController : MonoBehaviour
     /// </summary>
     private void UpdateAnimations()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        _animator.SetBool(Horizontal, horizontal != 0.0f);
-        
+        _animator.SetBool("onground", _isAttached);
     }
     
     /// <summary>
@@ -605,6 +706,13 @@ public class MovementController : MonoBehaviour
     {
         // TODO: 根据干燥值更新Sprite
         Debug.Log("干燥阶段: " + dryValue);
+    }
+    
+    private void SpriteRotation(Vector2 normal)
+    {
+        // 计算法线向量与上方向的夹角
+        float angle = Vector2.SignedAngle(Vector2.up, normal);
+        transform.localEulerAngles = new Vector3(0f, 0f, angle);
     }
     
     /// <summary>
