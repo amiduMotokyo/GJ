@@ -373,6 +373,10 @@ public class MovementController : MonoBehaviour
             
             // 判断主要的碰撞方向
             bool isHorizontalCollision = Mathf.Abs(normal.x) > Mathf.Abs(normal.y);
+            
+            // 触发对应方向的撞击动画
+            _animator.SetTrigger(isHorizontalCollision ? "side" : "top");
+            
             // 根据碰撞方向选择参考速度
             float maxReferenceSpeed = isHorizontalCollision 
                 ? _currentConfig.maxHorizontalSpeed
@@ -720,8 +724,54 @@ public class MovementController : MonoBehaviour
     /// </summary>
     private void PopBubble()
     {
+        // 禁用控制
+        enabled = false;
+    
+        // 清除所有速度
+        _rb.velocity = Vector2.zero;
+        _rb.angularVelocity = 0f;
+    
+        // 触发破裂动画
+        _animator.SetTrigger("dead");
+    
+        // 播放音效
         PlayPopSound();
+    
+        // 触发破裂事件
         OnBubblePopped?.Invoke();
+    
+        // 启动销毁协程
+        StartCoroutine(DestroyAfterAnimation());
+    }
+    
+    /// <summary>
+    /// 等待动画播放完成后销毁泡泡的协程
+    /// </summary>
+    private IEnumerator DestroyAfterAnimation()
+    {
+        // 等待一帧确保动画状态切换完成
+        yield return null;
+    
+        // 等待直到进入破裂动画状态
+        float timeout = 0f;
+        while (!_animator.GetCurrentAnimatorStateInfo(0).IsName("explode") && timeout < 1f)
+        {
+            timeout += Time.deltaTime;
+            yield return null;
+        }
+    
+        if (timeout >= 1f)
+        {
+            Debug.LogWarning("等待进入破裂动画状态超时");
+            gameObject.SetActive(false);
+            yield break;
+        }
+    
+        // 获取动画片段长度并等待播放完成
+        float animationLength = _animator.GetCurrentAnimatorStateInfo(0).length;
+        yield return new WaitForSeconds(animationLength);
+    
+        // 销毁对象
         gameObject.SetActive(false);
     }
     
