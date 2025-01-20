@@ -29,7 +29,10 @@ public class CameraController : MonoBehaviour
     {
         _player = GameObject.FindWithTag("player");
         _cameraBound = GameObject.Find("CameraBounds").gameObject;
-        _virtualCamera.Follow = _player.transform;
         _confiner.m_BoundingShape2D = _cameraBound.GetComponent<PolygonCollider2D>();
+        if (_player != null)
+        {
+            _virtualCamera.Follow = _player.transform;
+        }
     }
 }
